@@ -4,15 +4,18 @@
 
 ---
 
-## 1. Abstrakt
+## 1. Kontext
 
-Cílem tohoto projektu je navrhnout a popsat architekturu backendového systému, který umožní umělé inteligenci (AI) efektivně pracovat s technickými daty o chytré domácnosti. Systém transformuje nestrukturované dokumenty (PDF, HTML, obrázky) do multimodální znalostní báze, která se skládá z vektorové databáze a znalostního grafu. Jádrem systému je RAG (Retrieval-Augmented Generation), který poskytuje relevantní kontext AI agentovi pro generování přesných odpovědí. Interakce se systémem probíhá přes REST API.
+Cílem je vytvořit systém, který umožní umělé inteligenci efektivně pracovat s technickými
+daty o chytrých domácnostech. Tato data budou pocházet z různorodých zdrojů, jako jsou
+manuály, webové stránky, datasheety nebo PDF dokumenty. Systém by měl umožnit AI
+agentovi poskytovat přesná a relevantní doporučení při návrhu řešení chytré domácnosti.
 
 ---
 
-## 2. Architektura Řešení
+## 2. Architektura řešení
 
-### 2.1 High-Level Diagram
+### 2.1 High-Level diagram
 
 Architektura je navržena tak, aby oddělovala proces zpracování dat (ingestion) od procesu dotazování (querying). Znázorňuje ji `HL diagram`.
 
@@ -33,18 +36,18 @@ Architektura je navržena tak, aby oddělovala proces zpracování dat (ingestio
 
 ### 2.3 Výběr technologií a zdůvodnění
 
-Následující tabulka podrobně popisuje výběr technologií pro jednotlivé moduly systému, včetně zdůvodnění volby s ohledem na klíčové vlastnosti.
+Následující tabulka popisuje výběr technologií pro jednotlivé moduly, včetně zdůvodnění volby s ohledem na klíčové vlastnosti.
 
 | Modul | Navržená Technologie | Zdůvodnění (Výkon, Licence, Integrace, Omezení) |
 | :--- | :--- | :--- |
-| **Ingestion Pipeline** | **Prefect** | **Výkon:** Jednoduše řídí úlohy „na pozadí“ (asynchronně), plánování a automatické opakování neúspěšných kroků. <br> **Licence:** Open‑source, vhodné i pro komerční použití; k dispozici i cloud verze. <br> **Integrace:** Přirozené pro Python, snadné spouštění parsovacích skriptů a volání API. <br> **Omezení:** Menší ekosystém pluginů než u „větších“ orchestrátorů, ale výrazně snazší začátky. |
-| **Indexace** | **LlamaIndex (LlamaIndex Inc.)** | **Výkon:** Pomáhá budovat RAG. Umí rozdělit text na menší části (chunky), vytvořit indexy pro rychlé hledání a nastavit “retrievery”; zvládne i chytřejší dělení a zkracování textu (sumarizaci). <br> **Licence:** MIT (volná licence, dá se použít i v komerčních projektech bez složitých podmínek). <br> **Integrace:** Funguje jako “lepidlo” mezi soubory, modely pro embeddings, vektorovými databázemi a grafy; má spoustu hotových konektorů, takže se rychle propojuje. <br> **Omezení:** Je to vyšší vrstva nad detaily, takže při řešení nízkoúrovňových chyb může být ladění složitější. |
+| **Ingestion Pipeline** | **Prefect** | **Výkon:** Jednoduše řídí úlohy „na pozadí“ (asynchronně), podporuje plánování a automatické opakování neúspěšných kroků. <br> **Licence:** Open‑source, vhodné i pro komerční použití; k dispozici i cloud verze. <br> **Integrace:** Přirozené pro Python, snadné spouštění parsovacích skriptů a volání API. <br> **Omezení:** Menší ekosystém pluginů než u „větších“ orchestrátorů. |
+| **Indexace** | **LlamaIndex (LlamaIndex Inc.)** | **Výkon:** Umí rozdělit text na menší části (chunky), vytvořit indexy pro rychlé hledání; zvládne i chytřejší dělení a zkracování textu (sumarizaci). <br> **Licence:** MIT (volné použití, i komerční). <br> **Integrace:** Funguje jako “lepidlo” mezi soubory, modely pro embeddings, vektorovými databázemi a grafy; má spoustu hotových konektorů, takže se rychle propojuje. <br> **Omezení:** Je to vyšší vrstva, takže při řešení nízkoúrovňových chyb může být ladění složitější. |
 | **Storage Layer** | *Konceptuální vrstva* | Vrstvu tvoří dvě specializované databáze níže; dohromady tvoří znalostní bázi pro sémantické vyhledávání i přesná fakta. |
-| **Vector Database** | **Qdrant** | **Výkon:** Rychlé sémantické vyhledávání, „designed for real‑time applications“ – nízká latence pro online dotazy. <br> **Licence:** Open‑source, přívětivé pro firmy. <br> **Integrace:** Oficiální Python klient, podpora v LlamaIndex; filtry nad metadaty. <br> **Omezení:** Potřebuje RAM pro vektory a základní DevOps péči. |
-| **Knowledge Graph** | **Memgraph** | **Výkon:** Rychlá grafová databáze v paměti (in‑memory), vhodná pro dotazy v reálném čase – třeba hledání kompatibilit a závislostí. <br> **Licence:** K dispozici komerční edice, použitelné ve firmách. <br> **Integrace:** Existuje Python klient. <br> **Omezení:** Pro analytiku nad celým grafem je potřeba dobře navržené schéma a indexy. |
-| **RAG Orchestrator** | **LlamaIndex „Query Engine“** | **Výkon:** Řídí kroky RAG – vyhledá data v Qdrant (vektory) a v Memgraphu (graf), výsledky seřadí a zkrátí, a připraví zadání (prompt) pro LLM. <br> **Licence:** MIT (volná licence, dá se použít i v komerčních projektech bez složitých podmínek). <br> **Integrace:** Snadno propojuje LLM, vektorové databáze i grafové databáze. <br> **Omezení:** Je to framework – složitější přizpůsobení. |
+| **Vector Database** | **Qdrant** | **Výkon:** Rychlé vyhledávání, nízká latence pro online dotazy. <br> **Licence:** Open‑source, přívětivé pro firmy. <br> **Integrace:** Oficiální Python klient, podpora v LlamaIndex; filtry nad metadaty. <br> **Omezení:** Potřebuje RAM pro vektory a základní DevOps správu. |
+| **Knowledge Graph** | **Memgraph** | **Výkon:** Rychlá grafová databáze v paměti (in‑memory), vhodná pro dotazy v reálném čase. <br> **Licence:** K dispozici komerční edice, použitelné ve firmách. <br> **Integrace:** Existuje Python klient. <br> **Omezení:** Pro analytiku nad celým grafem je potřeba dobře navržené schéma a indexy. |
+| **RAG Orchestrator** | **LlamaIndex „Query Engine“** | **Výkon:** Řídí kroky RAG – vyhledá data v Qdrant (vektory) a v Memgraphu (graf), výsledky seřadí a zkrátí, a připraví zadání (prompt) pro LLM. <br> **Licence:** MIT (volné použití, i komerční). <br> **Integrace:** Snadno propojuje LLM, vektorové databáze i grafové databáze. <br> **Omezení:** Je to framework – složitější přizpůsobení. |
 | **LLM Agent** | **OpenAI** | **Výkon:** Vysoká kvalita odpovědí a dobrá rychlost pro produkční RAG scénáře. <br> **Licence:** Komerční API (platí se podle použití). <br> **Integrace:** Jednoduché REST API a oficiální knihovny; dobrá podpora i v LlamaIndex. <br> **Omezení:** Náklady a limity; u citlivých dat je nutné řešit zásady a šifrování. |
-| **API Gateway** | **FastAPI** (framework) | **Výkon:** Velmi rychlý Python framework. <br> **Licence:** MIT (volné použití, i komerční). <br> **Integrace:** Snadno napojí Python logiku (např. RAG orchestrátor) a umí automaticky vygenerovat dokumentaci (OpenAPI/Swagger). <br> **Omezení:** Menší ekosystém doplňků než u starších frameworků (např. Django). |
+| **API Gateway** | **FastAPI** (framework) | **Výkon:** Velmi rychlý Python framework. <br> **Licence:** MIT (volné použití, i komerční). <br> **Integrace:** Snadno napojí Python logiku (např. RAG orchestrátor) a umí automaticky vygenerovat dokumentaci. <br> **Omezení:** Menší ekosystém doplňků než u jiných frameworků (např. Django). |
 
 
 ### 2.4 Testování a metriky
