@@ -16,7 +16,7 @@ Cílem tohoto projektu je navrhnout a popsat architekturu backendového systému
 
 Architektura je navržena tak, aby oddělovala proces zpracování dat (ingestion) od procesu dotazování (querying). Znázorňuje ji `HL diagram`.
 
-![HL diagram](docs/hl-diagram.drawio.svg)
+![HL diagram](hl-diagram.drawio.svg)
 
 ### 2.2 Hlavní komponenty:
 
@@ -161,11 +161,7 @@ Odeslání zpětné vazby na kvalitu odpovědi pro budoucí vylepšování syst�
 ```
 ---
 
-## 5. Schéma komunikace mezi moduly
-
-Následující diagram znázorňuje sekvenci volání při zpracování POST /query požadavku.
-
-### Popis toku:
+## 5. Schéma komunikačního rozhraní mezi moduly
 
 * Klient pošle HTTP POST požadavek na API Gateway.
 
